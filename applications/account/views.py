@@ -45,7 +45,7 @@ class LogoutView(APIView):
 
 class ForgotPassword(APIView):
     def get(self, request):
-        email = request.user
+        email = request.user.email
         User = get_user_model()
         user = get_object_or_404(User, email=email)
         user.is_active = False
