@@ -44,7 +44,11 @@ class LogoutView(APIView):
 
 
 class ForgotPassword(APIView):
+    # permission_classes = [IsAuthenticated, ]
+
     def get(self, request):
+        print(request.auth)
+        print(dir(request))
         email = request.user.email
         User = get_user_model()
         user = get_object_or_404(User, email=email)
@@ -56,8 +60,9 @@ class ForgotPassword(APIView):
 
 
 class ForgotPasswordComplete(APIView):
-    def post(self, request):
+    def post(self, request, activation_code):
         data = request.data
+        data["activation_code"] = activation_code
         serializer = CreateNewPasswordSerializer(data=data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()

@@ -36,12 +36,11 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
+    'rest_framework.authtoken',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'rest_framework',
-    'rest_framework.authtoken',
     'rest_framework_swagger',
 
     'applications.account'
@@ -140,8 +139,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # rest_framework settings
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATED_CLASSES': [
-        'rest_framework.authenticated.TokenAuthenticated',
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
     ],
 
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
