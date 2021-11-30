@@ -61,7 +61,6 @@ class LoginSerializer(serializers.Serializer):
 
 class CreateNewPasswordSerializer(serializers.Serializer):
     email = serializers.EmailField()
-    activation_code = serializers.CharField(max_length=60)
     password = serializers.CharField(min_length=6, required=True)
     password_confirm = serializers.CharField(min_length=6, required=True)
 

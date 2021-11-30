@@ -1,13 +1,14 @@
 from rest_framework import status
-from django.contrib.auth import get_user_model
-from rest_framework.generics import get_object_or_404
-from rest_framework.authtoken.models import Token
-from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
+from rest_framework import serializers
 from rest_framework.views import APIView
+from .utils import  send_activation_email
+from rest_framework.response import Response
+from django.contrib.auth import get_user_model
+from rest_framework.authtoken.models import Token
+from rest_framework.generics import get_object_or_404
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authtoken.views import ObtainAuthToken
 from .serializers import RegisterSerializer, LoginSerializer, CreateNewPasswordSerializer
-from .utils import send_activation_email
 
 User = get_user_model()
 
@@ -60,10 +61,19 @@ class ForgotPassword(APIView):
 
 
 class ForgotPasswordComplete(APIView):
-    def post(self, request, activation_code):
+    def get(self, request, activation_code):
+        user = get_object_or_404(User, activation_code=activation_code, is_active=False)
         data = request.data
-        data["activation_code"] = activation_code
-        serializer = CreateNewPasswordSerializer(data=data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response('You have successfully reset your password', status=status.HTTP_200_OK)
+        password = data.get("password")
+        password_confirmation = data.get("password_confirmation")
+        if not password or not password_confirmation:
+            raise serializers.ValidationError('Should include password and password_confirmation')
+
+        if password != password_confirmation:
+            raise serializers.ValidationError('Passwords do not match')
+
+        user.is_active = True
+        user.activation_code = ''
+        user.set_password(password)
+        user.save()
+        return Response('You have successfully reset your password', status=status.HTTP_200_OK)
